@@ -1,0 +1,50 @@
+Expanding rule number: 2
+Executing rule: S-> ['AUX', 'NP', 'VP']
+Stack is now: 
+['VP', 'NP', 'AUX']
+Appended word : can to sentence
+Sentence is: 
+['can']
+Stack is now: 
+['VP', 'NP']
+Expanding rule number: 10
+Executing rule: NP-> ['PRO']
+Stack is now: 
+['VP', 'PRO']
+Appended word : it to sentence
+Sentence is: 
+['can', 'it']
+Stack is now: 
+['VP']
+Expanding rule number: 12
+Executing rule: VP-> ['V', 'NP']
+Stack is now: 
+['NP', 'V']
+Appended word : fly to sentence
+Sentence is: 
+['can', 'it', 'fly']
+Stack is now: 
+['NP']
+Expanding rule number: 6
+Executing rule: NP-> ['DET', 'ADJ*', 'N', 'PP*']
+Stack is now: 
+['PP*', 'N', 'ADJ*', 'DET']
+Appended word : the to sentence
+Sentence is: 
+['can', 'it', 'fly', 'the']
+Stack is now: 
+['PP*', 'N', 'ADJ*']
+Chose 0
+Stack is now: 
+['PP*', 'N']
+Appended word : boy to sentence
+Sentence is: 
+['can', 'it', 'fly', 'the', 'boy']
+Stack is now: 
+['PP*']
+Chose 0
+Stack is now: 
+[]
+Finally, Sentence is : 
+['can', 'it', 'fly', 'the', 'boy']
+[Finished]
