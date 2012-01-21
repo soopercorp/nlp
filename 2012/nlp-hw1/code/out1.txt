@@ -3,13 +3,17 @@ Executing rule: S-> ['AUX', 'NP', 'VP']
 Stack is now: 
 ['VP', 'NP', 'AUX']
 Appended word : may to sentence
+Sentence is: 
+['may']
 Stack is now: 
 ['VP', 'NP']
 Expanding rule number: 10
 Executing rule: NP-> ['PRO']
 Stack is now: 
 ['VP', 'PRO']
-Appended word : I to sentence
+Appended word : it to sentence
+Sentence is: 
+['may', 'it']
 Stack is now: 
 ['VP']
 Expanding rule number: 16
@@ -17,11 +21,15 @@ Executing rule: VP-> ['V', 'ADV']
 Stack is now: 
 ['ADV', 'V']
 Appended word : fly to sentence
+Sentence is: 
+['may', 'it', 'fly']
 Stack is now: 
 ['ADV']
 Appended word : incredibly to sentence
+Sentence is: 
+['may', 'it', 'fly', 'incredibly']
 Stack is now: 
 []
-Sentence is : 
-['may', 'I', 'fly', 'incredibly']
+Finally, Sentence is : 
+['may', 'it', 'fly', 'incredibly']
 [Finished]

@@ -1,0 +1,64 @@
+Expanding rule number: 2
+Executing rule: S-> ['AUX', 'NP', 'VP']
+Stack is now: 
+['VP', 'NP', 'AUX']
+Appended word : may to sentence
+Sentence is: 
+['may']
+Stack is now: 
+['VP', 'NP']
+Expanding rule number: 6
+Executing rule: NP-> ['DET', 'ADJ*', 'N', 'PP*']
+Stack is now: 
+['VP', 'PP*', 'N', 'ADJ*', 'DET']
+Appended word : an to sentence
+Sentence is: 
+['may', 'an']
+Stack is now: 
+['VP', 'PP*', 'N', 'ADJ*']
+Chose 0
+Stack is now: 
+['VP', 'PP*', 'N']
+Appended word : house to sentence
+Sentence is: 
+['may', 'an', 'house']
+Stack is now: 
+['VP', 'PP*']
+Chose 0
+Stack is now: 
+['VP']
+Expanding rule number: 14
+Executing rule: VP-> ['V', 'NP', 'PP*']
+Stack is now: 
+['PP*', 'NP', 'V']
+Appended word : kick to sentence
+Sentence is: 
+['may', 'an', 'house', 'kick']
+Stack is now: 
+['PP*', 'NP']
+Expanding rule number: 6
+Executing rule: NP-> ['DET', 'ADJ*', 'N', 'PP*']
+Stack is now: 
+['PP*', 'PP*', 'N', 'ADJ*', 'DET']
+Appended word : a to sentence
+Sentence is: 
+['may', 'an', 'house', 'kick', 'a']
+Stack is now: 
+['PP*', 'PP*', 'N', 'ADJ*']
+Chose 0
+Stack is now: 
+['PP*', 'PP*', 'N']
+Appended word : boy to sentence
+Sentence is: 
+['may', 'an', 'house', 'kick', 'a', 'boy']
+Stack is now: 
+['PP*', 'PP*']
+Chose 0
+Stack is now: 
+['PP*']
+Chose 0
+Stack is now: 
+[]
+Finally, Sentence is : 
+['may', 'an', 'house', 'kick', 'a', 'boy']
+[Finished]
