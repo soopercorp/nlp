@@ -119,7 +119,7 @@ def main():
 		print stack
 	
 	print "Finally, Sentence is : "
-	print sentence
+	print ' '.join(sentence)
 		
 if __name__ == '__main__':
 	main()
