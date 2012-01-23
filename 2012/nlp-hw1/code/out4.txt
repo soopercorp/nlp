@@ -1,0 +1,55 @@
+Expanding rule number: 2
+Executing rule: S-> ['AUX', 'NP', 'VP']
+Stack is now: 
+['VP', 'NP', 'AUX']
+Appended word : may to sentence
+Sentence is: 
+['may']
+Stack is now: 
+['VP', 'NP']
+Expanding rule number: 8
+Executing rule: NP-> ['DET', 'N', 'PP*']
+Stack is now: 
+['VP', 'PP*', 'N', 'DET']
+Appended word : the to sentence
+Sentence is: 
+['may', 'the']
+Stack is now: 
+['VP', 'PP*', 'N']
+Appended word : girl to sentence
+Sentence is: 
+['may', 'the', 'girl']
+Stack is now: 
+['VP', 'PP*']
+Chose 0
+Stack is now: 
+['VP']
+Expanding rule number: 12
+Executing rule: VP-> ['V', 'NP']
+Stack is now: 
+['NP', 'V']
+Appended word : kick to sentence
+Sentence is: 
+['may', 'the', 'girl', 'kick']
+Stack is now: 
+['NP']
+Expanding rule number: 8
+Executing rule: NP-> ['DET', 'N', 'PP*']
+Stack is now: 
+['PP*', 'N', 'DET']
+Appended word : a to sentence
+Sentence is: 
+['may', 'the', 'girl', 'kick', 'a']
+Stack is now: 
+['PP*', 'N']
+Appended word : house to sentence
+Sentence is: 
+['may', 'the', 'girl', 'kick', 'a', 'house']
+Stack is now: 
+['PP*']
+Chose 0
+Stack is now: 
+[]
+Finally, Sentence is : 
+may the girl kick a house
+[Finished]

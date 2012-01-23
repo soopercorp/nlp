@@ -19,7 +19,7 @@ def main():
 	gramlex.append("NP")				# 6
 	gramlex.append(["DET","ADJ*","N","PP*"])
 	gramlex.append("NP")				# 8
-	gramlex.append(["N","PP*"]) 			
+	gramlex.append(["DET","N","PP*"]) 			
 	gramlex.append("NP")				# 10
 	gramlex.append(["PRO"]) 			#
 	gramlex.append("VP")				# 12
