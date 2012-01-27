@@ -85,13 +85,13 @@ def main():
 		if(selectedRule <= 18):  							# After this we have the lexicon
 			if not "*" in gramlex[selectedRule]:
 				starChoiceMade = 1
-				print "Expanding rule number: {}".format(selectedRule)
+				print "Expanding rule number: {0}".format(selectedRule)
 				print "Executing rule: "+ gramlex[selectedRule]+"-> "+str(gramlex[selectedRule+1])
 			else:
 				starChoiceMade = int(random.choice(seed))
-				print "Chose {}".format(starChoiceMade)
+				print "Chose {0}".format(starChoiceMade)
 				if (starChoiceMade):
-					print "Expanding rule number: {}".format(selectedRule)
+					print "Expanding rule number: {0}".format(selectedRule)
 					print "Executing rule: "+ gramlex[selectedRule]+"-> "+str(gramlex[selectedRule+1])
 			stack.pop() # Pop the rule just executed
 			if starChoiceMade:
@@ -103,7 +103,7 @@ def main():
 				starChoiceMade = 1
 			else:
 				starChoiceMade = int(random.choice(seed))
-				print "Chose {}".format(starChoiceMade)
+				print "Chose {0}".format(starChoiceMade)
 				if (starChoiceMade):
 					word = selectRandomWord(selectedRule)	
 			stack.pop() # Pop the lexicon word
