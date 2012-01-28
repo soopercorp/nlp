@@ -77,7 +77,7 @@ def main():
 	"Expand the stack."
 	def expand(stack):
 		starChoiceMade = 0 # Chose the * in PP* etc. or not
-		selectedRule = selectRandomRule(stack[len(stack)-1])
+		selectedRule = selectRandomRule(stack[len(stack)-1]) # Select rule from top of stack
 		if(selectedRule <= 18):  							# After this we have the lexicon
 			if not "*" in gramlex[selectedRule]:
 				starChoiceMade = 1
