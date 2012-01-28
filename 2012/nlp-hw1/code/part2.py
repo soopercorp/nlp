@@ -54,9 +54,8 @@ def main():
 	stack = ["S"]
 	sentence = []
 	seed = "001" 	# seed for random choice between 0 an 1 P(0) = 2/3. P(1) = 1/3
-	"""
-	Selects a random rule from one of the matching rules. 
-	"""
+	
+	"Selects a random rule from one of the matching rules."
 	def selectRandomRule(rule):
 		i = -1
 		selected = []
@@ -70,15 +69,11 @@ def main():
 		return selectedRule
 	
 	
-	"""
-	Selects a random word from one of the lexicon definitions.
-	"""
+	"Selects a random word from one of the lexicon definitions."
 	def selectRandomWord(ruleNumber):
 		return random.sample(gramlex[ruleNumber+1],1)[0] # returns the string form of selected random word
 
-	"""
-	Expand the stack.
-	"""
+	"Expand the stack."
 	def expand(stack):
 		starChoiceMade = 0 # Chose the * in PP* etc. or not
 		selectedRule = selectRandomRule(stack[len(stack)-1])
