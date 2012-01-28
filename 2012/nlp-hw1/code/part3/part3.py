@@ -30,14 +30,13 @@ def main():
 				print "\n"
 		
 		
-	# grammar list
+	# initialize list of grammar rules
 	g = []
 	
 	# add items
-	rhsRule = \
-	[OrderedDict([("NP",["head","agent"]),("VP",["head"])]),\
-	OrderedDict([("AUX",["head","agent"]),("NP",["head","agent"]),("VP",["head"])]),\
-	OrderedDict([("DET",["head","determiner"]),("ADJ*",["head"]),("N",["head","type"]),("PP*",["head"])])]
+	rhsRule = 	[OrderedDict([("NP",["head","agent"]),("VP",["head"])]),\
+				OrderedDict([("AUX",["head","agent"]),("NP",["head","agent"]),("VP",["head"])]),\
+				OrderedDict([("DET",["head","determiner"]),("ADJ*",["head"]),("N",["head","type"]),("PP*",["head"])])]
 	
 	# add S
 	g.append(Grammar("S",rhsRule)) 
@@ -55,6 +54,8 @@ def main():
 	frame = dict(inRep)
 
 	pp.pprint(frame)
+
+	# lexicon
 		
 if __name__ == '__main__':
 	main()
