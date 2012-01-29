@@ -2,7 +2,7 @@
 # @author Hardik Ruparel
 # @copyright All Rights Reserved
 # @todo Testing
-# @execute http://ideone.com/GU2U7
+# @execute http://nlp.hardikr.com/hw1/part2
 
 import random
 
