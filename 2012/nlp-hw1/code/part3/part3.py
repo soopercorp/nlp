@@ -3,11 +3,16 @@
 # @copyright All Rights Reserved
 
 from collections import OrderedDict
-from itertools import chain
 from sys import stdout
 import pprint
 
 pp = pprint.PrettyPrinter(indent=2)
+
+# Frame Parts-of-Speech list
+nounList = ["information","location","instrument","source","destination",\
+			"beneficiary","time","location","attribute","experiencer","agent","patient"]
+verbList = ["color","age","size","quality"]
+advList = ["manner"]
 
 def main():
 	
@@ -30,15 +35,41 @@ def main():
 					print " {0} ".format(v),
 				print "\n"
 	
-	"""Determines if current rule is in lexicon or not
-	Eg : isInLexicon(N[])
+	"""Returns correct word from lexicon
+	Eg : findWord("N",{"number":"many"},{"type":"potato"})
+			returns "potatoes"
+		 findWord("V",{"time":"past"},{"type":"cook"})
+		 	returns "cooked"
 	"""
-	def isInLexicon(rule):
-		for w in [item for sublist in lexicon["N"] for item in sublist]:
-		if(w == word):
-			return 1
+	def findWord(rule,inflect,frame):
+		if(rule == "N"): # Noun
+			word = frame["type"]
+			l = [item for sublist in lexicon[rule] for item in sublist] # flattened list
+			for index,w in enumerate(l):
+				if(w == word):
+					if(inflect["number"]=="single"):
+						return l[index] # Singular
+					else: 
+						return l[index+1] # Plural
+		
+		if(rule == "V"): # Verb
+			word = frame["type"]
+			l = [item for sublist in lexicon[rule] for item in sublist] # flattened list
+			for index,w in enumerate(l):
+				if(w == word):
+					if(inflect["time"]=="present"):
+						return l[index] # Present
+					elif(inflect["time"]=="past"):
+						return l[index+1] # Past
+					else:
+						return "will "+l[index] # Future
+	
 
-
+	"""Determines Part-of-Speech Type of frame :id
+	Eg : posType(["agent","type"])
+	"""
+	def posType(word):
+		pass
 	"""
 	Parses the grammar passed with the frame included
 	Eg: Parse("NP[head:agent]",frame)
@@ -72,10 +103,9 @@ def main():
 
 	# lexicon format
 	# N : [[singular,plural]]
-	# V : [[present, past]]
+	# V : [[present, past, future]]
 	# AUX : [[present, present-neg, past, past-neg]]
-	# ADJ : [list of adj]
-	# ADV : [list of adv]
+	# ADJ : [list of adj] ,  ADV : [list of adv] , PREP : [list of Prep]
 	lexicon = {}
 
 	lexicon = { 
@@ -90,6 +120,10 @@ def main():
 
 	#pp.pprint(lexicon)
 	
-	
+	# Test cases
+	print findWord("N",{"number":"single"},{"type":"potato"})
+	print findWord("V",{"time":"past"},{"type":"prepare"})
+
+
 if __name__ == '__main__':
 	main()
