@@ -1,0 +1,39 @@
+At McDonalds, we knwo that nothing complements a hamburger like tasty hot french fries.
+
+Regarding french fries, we feel that fresh is the best way.
+
+A french fry is only as good as the potato it comes from.
+
+So we use fresh large potatoes.
+
+And we deliver them fresh to our stores.
+
+Every day, we take whole new potatoes.
+
+We prepare the potatoes individually.
+
+Then we cook them in trans-fat-free vegetable oil.
+
+We do not use a freezer.
+
+# RESULT: 
+
+At/IN McDonalds/NNP ,/, we/PRP knwo/VBP that/DT nothing/NN complements/NNS a/DT hamburger/NN like/IN tasty/JJ hot/JJ french/NN fries/NNS ./. 
+
+Regarding/VBG french/NN fries/NNS ,/, we/PRP feel/VBP that/IN fresh/JJ is/VBZ the/DT best/JJS way/NN ./. 
+
+A/DT french/NN fry/VB is/VBZ only/RB as/RB good/JJ as/IN the/DT potato/NN it/PRP comes/VBZ from/IN ./. 
+
+So/IN we/PRP use/VBP fresh/JJ large/JJ potatoes/NNS ./. 
+
+And/CC we/PRP deliver/VBP them/PRP fresh/JJ to/TO our/PRP$ stores/NNS ./. 
+
+Every/DT day/NN ,/, we/PRP take/VBP whole/JJ new/JJ potatoes/NNS ./. 
+
+We/PRP prepare/VBP the/DT potatoes/NNS individually/RB ./. 
+
+Then/RB we/PRP cook/VBP them/PRP in/IN trans-fat-free/JJ vegetable/NN oil/NN ./. 
+
+We/PRP do/VBP not/RB use/VB a/DT freezer/NN ./. 
+
+I/PRP do/VBP not/RB want/VB to/TO drive/VB slowly/RB ./. 
