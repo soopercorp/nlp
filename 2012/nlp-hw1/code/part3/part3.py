@@ -7,6 +7,7 @@
 from collections import OrderedDict
 from sys import stdout
 import pprint
+import random
 
 pp = pprint.PrettyPrinter(indent=2)
 
@@ -88,10 +89,30 @@ def main():
 			else:
 				# We are selecting a word. Most probably for a question
 				l = [item for sublist in lexicon[rule] for item in sublist] # flattened list
-				for index,w in enumerate(l):
-					if("time" in inflect):
-						if(inflect["time"] == "past"): 
-							
+				sel = [] # will select randomly from this list
+				if(inflect["time"] == "past"): 
+					if(inflect["polarity"] == "positive"): # Past positive : start from l[2]
+						for i in range(len(l)):
+							if(i%4==2):
+								sel.append(l[i])
+						return random.sample(sel,1)
+					else: # Past negative : start from l[3]
+						for i in range(len(l)):
+							if(i%4==3):
+								sel.append(l[i])
+						return random.sample(sel,1)
+				else: # time is present/future
+					if(inflect["polarity"] == "positive"): # Present positive : start from l[2]
+						for i in range(len(l)):
+							if(i%4==0):
+								sel.append(l[i])
+						return random.sample(sel,1)
+					else: # Past negative : start from l[1]
+						for i in range(len(l)):
+							if(i%4==1):
+								sel.append(l[i])
+						return random.sample(sel,1)
+								
 		elif(rule == "ADJ" or rule == "PREP" or rule == "DET"): # Adjective or Preposition or Gerund
 			word = frame["type"]
 			for index,w in enumerate(lexicon[rule]):
@@ -135,8 +156,9 @@ def main():
 				elif(k == "det"):
 					patientDet = findWord("DET",{},{"type":frame["patient"][k]})
 		if("speechact" in question): 
-			if(frame["speechact"] = "question"): # append aux before and ? after sentence
-				inflect = {"time":frame["time"], "polarity": frame["polarity"], {}}
+			if(frame["speechact"] == "question"): # append aux before and ? after sentence
+				inflect = {"time":frame["time"], "polarity": frame["polarity"]} 
+
 				
 		print ' '.join([agentDet,agentNoun,mainVerb,patientDet,patientNoun]) 
 		
