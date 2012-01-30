@@ -61,11 +61,11 @@ def main():
 				if(w == word):
 					if(inflect["time"]=="present"):
 						if(inflect["number"]=="single"):
-							return l[index] # Present
+							return l[index] # Present (Eat)
 						else:
-							return l[index+2] # Present & plural
+							return l[index+2] # Present & plural (Eats)
 					elif(inflect["time"]=="past"):
-						return l[index+1] # Past
+						return l[index]   
 					else:
 						return "will "+l[index] # Future
 		elif(rule == "AUX"): # Auxillary
@@ -90,7 +90,36 @@ def main():
 					return word
 		elif(rule == "TO"):
 			return "to"
-		
+	
+	def findWords(frame):
+		if("type" in frame): # main verb
+			inflect = []
+			patientAdj = []
+			agentAdj = []
+			if("time" in frame):
+				inflect.append(("time",frame["time"]))
+			if("speechact" in frame):
+				inflect.append(("speechact",frame["speechact"]))
+			if("polarity" in frame):
+				inflect.append(("polarity",frame["polarity"]))
+			print "Main verb: "+findWord("V",dict(inflect),{"type":frame["type"]})
+
+		if("agent" in frame): # main agent noun
+			for k,v in frame["agent"].items():
+				if(k=="type"): # main noun
+					noun = frame["agent"]["type"]
+					print "AGENT Noun: " + noun
+				elif(k in adjList):
+					agentAdj.append(findWord("ADJ",{},{"type":frame["agent"][k]}))
+		if("patient" in frame): # main 
+			for k,v in frame["patient"].items():
+				if(k=="type"): # main patient noun
+					noun = frame["patient"]["type"]
+					print "PATIENT Noun: "+noun
+				elif(k in adjList):
+					patientAdj.append(findWord("ADJ",{},{"type":frame["patient"][k]}))
+		print patientAdj
+		print agentAdj
 		
 	"""Determines Part-of-Speech Type of frame :id
 	Eg : posType("agent")
@@ -102,6 +131,8 @@ def main():
 			return "V"
 		elif word in advList:
 			return "ADV"
+		elif word in adjList:
+			return "ADJ"	
 
 	
 	"""
@@ -125,16 +156,7 @@ def main():
 	# loop over grammar and print rules
 	for i in range(len(g)):
 		Grammar.parse(g[i])
-	
-	# Initialize frame
-	frame = {}
 
-	inRep = [("type","eat"),("agent",dict((["type","man"],["size","large"]))),\
-			("pateint",dict((["type","peach"],["size","small"],["color","red"]))),\
-			("time","past"),("speechact","question"),("polarity","pos")]
-	frame = dict(inRep)
-
-	pp.pprint(frame)
 
 	# lexicon format
 	# N : [[singular,plural]]
@@ -144,29 +166,38 @@ def main():
 	lexicon = {}
 
 	lexicon = { 
-	  "N":[['potato',"potatoes"],["In-N-Out","In-N-Out"],["french-fry","french-fries"],["way","ways"]],\
+	  "N":[["potato","potatoes"],["In-N-Out","In-N-Out"],["french-fry","french-fries"],["way","ways"],
+	  		["store","stores"],["we","we"],["man","men"],["peach","peaches"]],\
 	  "V": [["cook","cooked","cooks"],["prepare","prepared","prepares"],["use","used","uses"],\
 	  		["deliver","delivered","delivers"],["take","took","took"], ["complement","complemented","complements"],\
-	  		["is","was","will be"],["do","did","will do"]],
+	  		["is","was","will be"],["do","did","will do"],["know","knew","knows"],["eat","ate","eats"]],
 	  "AUX": [["can","cannot","could","could not"],["should","should not","should have","shouldn't have"],\
 	   		 ["does","does not","did","did not"],["will","will not","would","would not"]],\
-	  "ADJ": ["old","best","new","tasty","fresh","good","whole","trans-fat-free","vegetable","hot"],\
+	  "ADJ": ["bold","best","large","tasty","fresh","good","whole","trans-fat-free","vegetable",\
+	  		  "hot","large","red","small"],\
 	  "ADV": ["individually","not"],
-	  "PREP": ["at","that","we"],
-	  "DET": ["a","an","the","that"]
+	  "PREP": ["at","that","we","our"],
+	  "DET": ["a","an","the","that"],
 	  "GER": ["regarding"],
 	  "TO" : ["to"]
 	}
-
-	#pp.pprint(lexicon)
 	
 	# Test cases
-	print findWord("N",{"number":"single"},{"type":"potato"})
-	print findWord("V",{"time":"future","number":"plural"},{"type":"prepare"})
-	print findWord("AUX",{"time":"past","polarity":"neg"},{"type":"should"})
-	print findWord("ADJ",{},{"type":"best"})
-	print findWord("PREP",{},{"type":"at"})
+	#print findWord("N",{"number":"pluaral"},{"type":"we"})
+	#print findWord("V",{"time":"future","number":"plural"},{"type":"prepare"})
+	#print findWord("AUX",{"time":"past","polarity":"neg"},{"type":"should"})
+	#print findWord("ADJ",{},{"type":"best"})
+	#print findWord("PREP",{},{"type":"at"})
 
+	# Initialize frame
+	frame = {}
+
+	inRep = [("type","eat"),("agent",dict((["type","man"],["det","the"],["size","large"],["number","single"]))),\
+			("patient",dict((["type","peach"],["size","small"],["color","red"]))),\
+			("time","past"),("speechact","question"),("polarity","pos"),("number","single")]
+	frame = dict(inRep)
+
+	findWords(frame)
 
 if __name__ == '__main__':
 	main()
