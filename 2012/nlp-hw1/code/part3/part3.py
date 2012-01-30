@@ -10,7 +10,7 @@ import pprint
 
 pp = pprint.PrettyPrinter(indent=2)
 
-# Frame Parts-of-Speech list
+# frame Parts-of-Speech list
 nounList = ["information","location","instrument","source","destination",\
 			"beneficiary","time","location","attribute","experiencer","agent","patient"]
 adjList = ["color","age","size","quality"]
@@ -69,21 +69,30 @@ def main():
 					else:
 						return "will "+l[index] # Future
 		elif(rule == "AUX"): # Auxillary
-			word = frame["type"]
-			l = [item for sublist in lexicon[rule] for item in sublist] # flattened list
-			for index,w in enumerate(l):
-				if(w==word):
-					if(inflect["time"]=="present"):
-						if(inflect["polarity"]=="pos"): 
-							return l[index] 			# present positive (can)
-						else:
-							return l[index+1]			# present negative (cannot)
-					else:
-						if(inflect["polarity"]=="pos"):
-							return l[index+2]			# past positive (could)
-						else:
-							return l[index+3]			# past negative (could not)
-		elif(rule == "ADJ" or rule == "PREP" or rule == "GER"): # Adjective or Preposition or Gerund
+			if("type" in frame):
+				word = frame["type"]
+				l = [item for sublist in lexicon[rule] for item in sublist] # flattened list
+				for index,w in enumerate(l):
+					if(w==word):
+						if "time" in inflect:
+							if(inflect["time"]=="present"):
+								if(inflect["polarity"]=="pos"): 
+									return l[index] 			# present positive (can)
+								else:
+									return l[index+1]			# present negative (cannot)
+							else:
+								if(inflect["polarity"]=="pos"):
+									return l[index+2]			# past positive (could)
+								else:
+									return l[index+3]			# past negative (could not)
+			else:
+				# We are selecting a word. Most probably for a question
+				l = [item for sublist in lexicon[rule] for item in sublist] # flattened list
+				for index,w in enumerate(l):
+					if("time" in inflect):
+						if(inflect["time"] == "past"): 
+							
+		elif(rule == "ADJ" or rule == "PREP" or rule == "DET"): # Adjective or Preposition or Gerund
 			word = frame["type"]
 			for index,w in enumerate(lexicon[rule]):
 				if(w==word):
@@ -96,30 +105,40 @@ def main():
 			inflect = []
 			patientAdj = []
 			agentAdj = []
+			agentNoun = ""
+			patientNoun = ""
+			mainVerb = ""
+			agentDet = ""
+			patientDet = ""
 			if("time" in frame):
 				inflect.append(("time",frame["time"]))
 			if("speechact" in frame):
 				inflect.append(("speechact",frame["speechact"]))
 			if("polarity" in frame):
 				inflect.append(("polarity",frame["polarity"]))
-			print "Main verb: "+findWord("V",dict(inflect),{"type":frame["type"]})
+			mainVerb = findWord("V",dict(inflect),{"type":frame["type"]})
 
 		if("agent" in frame): # main agent noun
 			for k,v in frame["agent"].items():
 				if(k=="type"): # main noun
-					noun = frame["agent"]["type"]
-					print "AGENT Noun: " + noun
+					agentNoun = frame["agent"]["type"]
 				elif(k in adjList):
 					agentAdj.append(findWord("ADJ",{},{"type":frame["agent"][k]}))
-		if("patient" in frame): # main 
+				elif(k == "det"):
+					agentDet = findWord("DET",{},{"type":frame["agent"][k]})
+		if("patient" in frame): # main  patient noun
 			for k,v in frame["patient"].items():
 				if(k=="type"): # main patient noun
-					noun = frame["patient"]["type"]
-					print "PATIENT Noun: "+noun
+					patientNoun  = frame["patient"]["type"]
 				elif(k in adjList):
 					patientAdj.append(findWord("ADJ",{},{"type":frame["patient"][k]}))
-		print patientAdj
-		print agentAdj
+				elif(k == "det"):
+					patientDet = findWord("DET",{},{"type":frame["patient"][k]})
+		if("speechact" in question): 
+			if(frame["speechact"] = "question"): # append aux before and ? after sentence
+				inflect = {"time":frame["time"], "polarity": frame["polarity"], {}}
+				
+		print ' '.join([agentDet,agentNoun,mainVerb,patientDet,patientNoun]) 
 		
 	"""Determines Part-of-Speech Type of frame :id
 	Eg : posType("agent")
@@ -148,7 +167,7 @@ def main():
 	# add items
 	rhsRule = 	[OrderedDict([("NP",["head","agent"]),("VP",["head"])]),\
 				OrderedDict([("AUX",["head","agent"]),("NP",["head","agent"]),("VP",["head"])]),\
-				OrderedDict([("DET",["head","determiner"]),("ADJ*",["head"]),("N",["head","type"]),("PP*",["head"])])]
+				OrderedDict([("DET",["head","det"]),("ADJ*",["head"]),("N",["head","type"]),("PP*",["head"])])]
 	
 	# add rules for S
 	g.append(Grammar("S",rhsRule)) 
@@ -193,7 +212,7 @@ def main():
 	frame = {}
 
 	inRep = [("type","eat"),("agent",dict((["type","man"],["det","the"],["size","large"],["number","single"]))),\
-			("patient",dict((["type","peach"],["size","small"],["color","red"]))),\
+			("patient",dict((["type","peach"],["size","small"],["color","red"],["det","a"]))),\
 			("time","past"),("speechact","question"),("polarity","pos"),("number","single")]
 	frame = dict(inRep)
 
