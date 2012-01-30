@@ -62,7 +62,18 @@ def main():
 				if(w == word):
 					if(inflect["time"]=="present"):
 						if(inflect["number"]=="single"):
-							return l[index] # Present (Eat)
+							if(inflect["polarity"] == "pos"):
+								return l[index] # Present (Eat)
+							else:
+								# have to find an aux
+								ls = [item for sublist in lexicon["AUX"] for item in sublist] # flattened list
+								sel = [] # will select randomly from this list
+								for i in range(len(ls)):
+									if(i%4==1):
+										sel.append(ls[i])
+								neg = ''.join(random.sample(sel,1))
+								return ' '.join([neg,l[index]])
+
 						else:
 							return l[index+2] # Present & plural (Eats)
 					elif(inflect["time"]=="past"):
@@ -91,7 +102,7 @@ def main():
 				l = [item for sublist in lexicon[rule] for item in sublist] # flattened list
 				sel = [] # will select randomly from this list
 				if(inflect["time"] == "past"): 
-					if(inflect["polarity"] == "positive"): # Past positive : start from l[2]
+					if(inflect["polarity"] == "pos"): # Past positive : start from l[2]
 						for i in range(len(l)):
 							if(i%4==2):
 								sel.append(l[i])
@@ -102,12 +113,12 @@ def main():
 								sel.append(l[i])
 						return random.sample(sel,1)
 				else: # time is present/future
-					if(inflect["polarity"] == "positive"): # Present positive : start from l[2]
+					if(inflect["polarity"] == "pos"): # Present positive : start from l[2]
 						for i in range(len(l)):
 							if(i%4==0):
 								sel.append(l[i])
 						return random.sample(sel,1)
-					else: # Past negative : start from l[1]
+					else: # present negative : start from l[1]
 						for i in range(len(l)):
 							if(i%4==1):
 								sel.append(l[i])
@@ -131,12 +142,15 @@ def main():
 			mainVerb = ""
 			agentDet = ""
 			patientDet = ""
+			q = ""
 			if("time" in frame):
 				inflect.append(("time",frame["time"]))
 			if("speechact" in frame):
 				inflect.append(("speechact",frame["speechact"]))
 			if("polarity" in frame):
 				inflect.append(("polarity",frame["polarity"]))
+			if("number" in frame):
+				inflect.append(("number",frame["number"]))
 			mainVerb = findWord("V",dict(inflect),{"type":frame["type"]})
 
 		if("agent" in frame): # main agent noun
@@ -155,13 +169,15 @@ def main():
 					patientAdj.append(findWord("ADJ",{},{"type":frame["patient"][k]}))
 				elif(k == "det"):
 					patientDet = findWord("DET",{},{"type":frame["patient"][k]})
-		if("speechact" in question): 
+		if("speechact" in frame): 
 			if(frame["speechact"] == "question"): # append aux before and ? after sentence
 				inflect = {"time":frame["time"], "polarity": frame["polarity"]} 
-
-				
-		print ' '.join([agentDet,agentNoun,mainVerb,patientDet,patientNoun]) 
+				q = ''.join(findWord("AUX",inflect,{}))
 		
+		if(q):		
+			print ' '.join([q,agentDet,agentNoun,mainVerb,patientDet,patientNoun,"?"]) 
+		else:
+			print ' '.join([agentDet,agentNoun,mainVerb,patientDet,patientNoun])
 	"""Determines Part-of-Speech Type of frame :id
 	Eg : posType("agent")
 	"""
@@ -213,7 +229,7 @@ def main():
 	  		["deliver","delivered","delivers"],["take","took","took"], ["complement","complemented","complements"],\
 	  		["is","was","will be"],["do","did","will do"],["know","knew","knows"],["eat","ate","eats"]],
 	  "AUX": [["can","cannot","could","could not"],["should","should not","should have","shouldn't have"],\
-	   		 ["does","does not","did","did not"],["will","will not","would","would not"]],\
+	   		 ["do","do not","did","did not"],["will","will not","would","would not"]],\
 	  "ADJ": ["bold","best","large","tasty","fresh","good","whole","trans-fat-free","vegetable",\
 	  		  "hot","large","red","small"],\
 	  "ADV": ["individually","not"],
@@ -236,6 +252,13 @@ def main():
 	inRep = [("type","eat"),("agent",dict((["type","man"],["det","the"],["size","large"],["number","single"]))),\
 			("patient",dict((["type","peach"],["size","small"],["color","red"],["det","a"]))),\
 			("time","past"),("speechact","question"),("polarity","pos"),("number","single")]
+	frame = dict(inRep)
+
+	findWords(frame)
+
+	inRep = [("type","use"),("agent",{"type":"we","number":"plural"}),\
+			("patient",{"type":"freezer","det":"a"}),\
+			("time","present"),("speechact","assertion"),("polarity","neg"),("number","single")]
 	frame = dict(inRep)
 
 	findWords(frame)
