@@ -164,6 +164,7 @@ def main():
 		if("patient" in frame): # main  patient noun
 			for k,v in frame["patient"].items():
 				if(k=="type"): # main patient noun
+				## TODO : Not checking for plurals here
 					patientNoun  = frame["patient"]["type"]
 				elif(k in adjList):
 					patientAdj.append(findWord("ADJ",{},{"type":frame["patient"][k]}))
@@ -240,7 +241,7 @@ def main():
 	}
 	
 	# Test cases
-	#print findWord("N",{"number":"pluaral"},{"type":"we"})
+	print findWord("N",{"number":"pluaral"},{"type":"potato"})
 	#print findWord("V",{"time":"future","number":"plural"},{"type":"prepare"})
 	#print findWord("AUX",{"time":"past","polarity":"neg"},{"type":"should"})
 	#print findWord("ADJ",{},{"type":"best"})
@@ -249,6 +250,7 @@ def main():
 	# Initialize frame
 	frame = {}
 
+	# Did the large man eat the peach?
 	inRep = [("type","eat"),("agent",dict((["type","man"],["det","the"],["size","large"],["number","single"]))),\
 			("patient",dict((["type","peach"],["size","small"],["color","red"],["det","a"]))),\
 			("time","past"),("speechact","question"),("polarity","pos"),("number","single")]
@@ -256,11 +258,21 @@ def main():
 
 	findWords(frame)
 
+	# We do not use the freezer
 	inRep = [("type","use"),("agent",{"type":"we","number":"plural"}),\
 			("patient",{"type":"freezer","det":"a"}),\
 			("time","present"),("speechact","assertion"),("polarity","neg"),("number","single")]
 	frame = dict(inRep)
 
+	findWords(frame)
+
+
+	# We prepare the potatoes individually.
+	inRep = [("type","prepare"),("agent",{"type":"we","number":"plural"}),\
+			("patient",{"type":"potato","det":"the","number":"plural"}),\
+			("time","present"),("speechact","assertion"),("polarity","pos"),("number","single"),\
+			("manner","individually")]
+	frame = dict(inRep)
 	findWords(frame)
 
 if __name__ == '__main__':
