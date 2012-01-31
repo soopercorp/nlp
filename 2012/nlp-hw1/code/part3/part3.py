@@ -17,6 +17,9 @@ nounList = ["information","location","instrument","source","destination",\
 adjList = ["color","age","size","quality"]
 advList = ["manner"]
 
+agentNum = "" 	# Agent is singular or plural
+patientNum = ""	# Patient is singular or plural
+
 def main():
 	
 	"""
@@ -133,16 +136,17 @@ def main():
 			return "to"
 	
 	def findWords(frame):
+		inflect = []
+		patientAdj = []
+		agentAdj = []
+		agentNoun = ""
+		patientNoun = ""
+		mainVerb = ""
+		agentDet = ""
+		patientDet = ""
+		q = ""
+
 		if("type" in frame): # main verb
-			inflect = []
-			patientAdj = []
-			agentAdj = []
-			agentNoun = ""
-			patientNoun = ""
-			mainVerb = ""
-			agentDet = ""
-			patientDet = ""
-			q = ""
 			if("time" in frame):
 				inflect.append(("time",frame["time"]))
 			if("speechact" in frame):
@@ -156,7 +160,7 @@ def main():
 		if("agent" in frame): # main agent noun
 			for k,v in frame["agent"].items():
 				if(k=="type"): # main noun
-					agentNoun = frame["agent"]["type"]
+					agentNoun = findWord("N",frame["agent"],frame["agent"])
 				elif(k in adjList):
 					agentAdj.append(findWord("ADJ",{},{"type":frame["agent"][k]}))
 				elif(k == "det"):
@@ -165,7 +169,7 @@ def main():
 			for k,v in frame["patient"].items():
 				if(k=="type"): # main patient noun
 				## TODO : Not checking for plurals here
-					patientNoun  = frame["patient"]["type"]
+					patientNoun  = findWord("N",frame["patient"],frame["patient"])
 				elif(k in adjList):
 					patientAdj.append(findWord("ADJ",{},{"type":frame["patient"][k]}))
 				elif(k == "det"):
@@ -179,19 +183,6 @@ def main():
 			print ' '.join([q,agentDet,agentNoun,mainVerb,patientDet,patientNoun,"?"]) 
 		else:
 			print ' '.join([agentDet,agentNoun,mainVerb,patientDet,patientNoun])
-	"""Determines Part-of-Speech Type of frame :id
-	Eg : posType("agent")
-	"""
-	def posType(word):
-		if word in nounList:
-			return "N"
-		elif word in verbList:
-			return "V"
-		elif word in advList:
-			return "ADV"
-		elif word in adjList:
-			return "ADJ"	
-
 	
 	"""
 	Parses the grammar passed with the frame included
@@ -225,7 +216,7 @@ def main():
 
 	lexicon = { 
 	  "N":[["potato","potatoes"],["In-N-Out","In-N-Out"],["french-fry","french-fries"],["way","ways"],
-	  		["store","stores"],["we","we"],["man","men"],["peach","peaches"]],\
+	  		["store","stores"],["we","we"],["man","men"],["peach","peaches"],["freezer","freezers"]],\
 	  "V": [["cook","cooked","cooks"],["prepare","prepared","prepares"],["use","used","uses"],\
 	  		["deliver","delivered","delivers"],["take","took","took"], ["complement","complemented","complements"],\
 	  		["is","was","will be"],["do","did","will do"],["know","knew","knows"],["eat","ate","eats"]],
@@ -241,7 +232,7 @@ def main():
 	}
 	
 	# Test cases
-	print findWord("N",{"number":"pluaral"},{"type":"potato"})
+	#print findWord("N",{"number":"pluaral"},{"type":"potato"})
 	#print findWord("V",{"time":"future","number":"plural"},{"type":"prepare"})
 	#print findWord("AUX",{"time":"past","polarity":"neg"},{"type":"should"})
 	#print findWord("ADJ",{},{"type":"best"})
@@ -252,15 +243,15 @@ def main():
 
 	# Did the large man eat the peach?
 	inRep = [("type","eat"),("agent",dict((["type","man"],["det","the"],["size","large"],["number","single"]))),\
-			("patient",dict((["type","peach"],["size","small"],["color","red"],["det","a"]))),\
+			("patient",dict((["type","peach"],["size","small"],["color","red"],["det","a"],["number","single"]))),\
 			("time","past"),("speechact","question"),("polarity","pos"),("number","single")]
 	frame = dict(inRep)
 
 	findWords(frame)
 
-	# We do not use the freezer
+	# We do not use a freezer
 	inRep = [("type","use"),("agent",{"type":"we","number":"plural"}),\
-			("patient",{"type":"freezer","det":"a"}),\
+			("patient",{"type":"freezer","det":"a","number":"single"}),\
 			("time","present"),("speechact","assertion"),("polarity","neg"),("number","single")]
 	frame = dict(inRep)
 
