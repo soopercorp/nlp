@@ -53,7 +53,6 @@ def main():
 			word = frame["type"]
 			l = [item for sublist in lexicon[rule] for item in sublist] # flattened list
 			for index,w in enumerate(l):
-				# TODO : Not checking for adjectives here - need to do according to rules
 				if(w == word):
 					if(inflect["number"]=="single"):
 						return l[index] # Singular
@@ -178,9 +177,11 @@ def main():
 
 		if("agent" in frame): # main agent noun
 			for k,v in frame["agent"].items():
+				# print "Parsing item in agent ", k
 				if(k=="type"): # main noun
 					agentNoun = findWord("N",frame["agent"],frame["agent"])
 				elif(k in adjList):
+					#agentAdj.append(findWord("ADJ",{},{"type":frame["agent"][k]}))
 					agentAdj.append(findWord("ADJ",{},{"type":frame["agent"][k]}))
 				elif(k == "det"):
 					agentDet = findWord("DET",{},{"type":frame["agent"][k]})
@@ -202,9 +203,9 @@ def main():
 				q = ''.join(findWord("AUX",inflect,{}))
 		
 		if(q):		
-			print ' '.join([q,agentDet,agentNoun,mainVerb,patientDet,patientNoun,"?"]) 
+			print ' '.join([q,agentDet,' '.join(agentAdj),agentNoun,mainVerb,patientDet,' '.join(patientAdj),patientNoun,"?"]) 
 		else:
-			print ' '.join([agentDet,agentNoun,mainVerb,patientDet,patientNoun])
+			print ' '.join([agentDet,' '.join(agentAdj),agentNoun,mainVerb,patientDet,' '.join(patientAdj),patientNoun])
 	
 	"""
 	Parses the grammar passed with the frame included
@@ -221,8 +222,31 @@ def main():
 				OrderedDict([("AUX",["head","agent"]),("NP",["head","agent"]),("VP",["head"])]),\
 				OrderedDict([("DET",["head","det"]),("ADJ*",["head"]),("N",["head","type"]),("PP*",["head"])])]
 	
-	# add rules for S
-	g.append(Grammar("S",rhsRule)) 
+	# S
+	g.append(Grammar("S",rhsRule))
+	
+	rhsRule = 	[OrderedDict([("DET",["head","det"]),("ADJ*",["head"]),("N",["head","type"]),("PP*",["head"])]),\
+				OrderedDict([("PRO",["head"])]),\
+				OrderedDict([("N",["head","type"]),("PP*",["head"])])]
+	
+	# NP
+	g.append(Grammar("NP",rhsRule))
+
+	rhsRule = 	[OrderedDict([("V",["head","type","head","time"]),("NP",["head","patient"])]),\
+				OrderedDict([("V",["head","type","head","time"]), ("NP",["head","patient"]), ("PP*",["head"])]),\
+				OrderedDict([("N",["head","type"]),("PP*",["head"])])]
+	
+	# VP
+	g.append(Grammar("VP",rhsRule))
+
+	rhsRule = 	[OrderedDict([("PREP",["head","role"]),("NP",["head"])])]
+	
+	# VP
+	g.append(Grammar("PP",rhsRule))
+
+		
+	
+	 
 
 	# loop over grammar and print rules
 	for i in range(len(g)):
@@ -250,7 +274,7 @@ def main():
 	  "PREP": ["at","that","we","our"],
 	  "DET": ["a","an","the","that"],
 	  "GER": ["regarding"],
-	  "TO" : ["to"]
+	  "PRO" : ["our","we",""]
 	}
 	
 	# Test cases
@@ -285,6 +309,13 @@ def main():
 			("patient",{"type":"potato","det":"the","number":"plural"}),\
 			("time","present"),("speechact","assertion"),("polarity","pos"),("number","single"),\
 			("manner","individually")]
+	frame = dict(inRep)
+	buildSentence(frame)
+
+	inRep = [("type","use"),("agent",{"type":"we","number":"plural"}),\
+			("patient",{"type":"potato","number":"plural","quality":"fresh","size":"large"}),\
+			("time","present"),("speechact","assertion"),("polarity","pos"),("number","single"),("aux","so")]
+
 	frame = dict(inRep)
 	buildSentence(frame)
 
