@@ -9,7 +9,7 @@ from sys import stdout
 import pprint
 import random
 
-pp = pprint.PrettyPrinter(indent=2)
+pp = pprint.PrettyPrinter(indent=1)
 
 # frame Parts-of-Speech list
 nounList = ["information","location","instrument","source","destination",\
@@ -41,7 +41,8 @@ def main():
 					print " {0} ".format(v),
 				print "\n"
 	
-	"""Returns correct word from lexicon
+	"""
+	Returns correct word from lexicon
 	Eg : findWord("N",{"number":"many"},{"type":"potato"})
 			returns "potatoes"
 		 findWord("V",{"time":"past"},{"type":"cook"})
@@ -52,6 +53,7 @@ def main():
 			word = frame["type"]
 			l = [item for sublist in lexicon[rule] for item in sublist] # flattened list
 			for index,w in enumerate(l):
+				# TODO : Not checking for adjectives here - need to do according to rules
 				if(w == word):
 					if(inflect["number"]=="single"):
 						return l[index] # Singular
@@ -66,7 +68,7 @@ def main():
 					if(inflect["time"]=="present"):
 						if(inflect["number"]=="single"):
 							if(inflect["polarity"] == "pos"):
-								return l[index] # Present (Eat)
+								retword = l[index] # Present (Eat)
 							else:
 								# have to find an aux
 								ls = [item for sublist in lexicon["AUX"] for item in sublist] # flattened list
@@ -75,14 +77,20 @@ def main():
 									if(i%4==1):
 										sel.append(ls[i])
 								neg = ''.join(random.sample(sel,1))
-								return ' '.join([neg,l[index]])
+								retword = ' '.join([neg,l[index]])
+								ls = [item for sublist in lexicon["AUX"] for item in sublist] # flattened list
+								for i,w in enumerate(ls):
+									if(w == inflect["aux"]):
+										neg = ls[i+1]
+								retword = ' '.join([neg,l[index]])
 
 						else:
-							return l[index+2] # Present & plural (Eats)
+							retword = l[index+2] # Present & plural (Eats)
 					elif(inflect["time"]=="past"):
-						return l[index]   
+						retword = l[index]   
 					else:
-						return "will "+l[index] # Future
+						retword = "will "+l[index] # Future
+			return retword
 		elif(rule == "AUX"): # Auxillary
 			if("type" in frame):
 				word = frame["type"]
@@ -103,13 +111,17 @@ def main():
 			else:
 				# We are selecting a word. Most probably for a question
 				l = [item for sublist in lexicon[rule] for item in sublist] # flattened list
-				sel = [] # will select randomly from this list
+				#sel = [] # will select randomly from this list
 				if(inflect["time"] == "past"): 
 					if(inflect["polarity"] == "pos"): # Past positive : start from l[2]
-						for i in range(len(l)):
-							if(i%4==2):
-								sel.append(l[i])
-						return random.sample(sel,1)
+						#for i in range(len(l)):
+						#	if(i%4==2):
+						#		sel.append(l[i])
+						#return random.sample(sel,1)
+						for i,w in enumerate(l):
+							if(w == inflect["aux"]):
+								neg = l[i]
+						return neg
 					else: # Past negative : start from l[3]
 						for i in range(len(l)):
 							if(i%4==3):
@@ -135,7 +147,11 @@ def main():
 		elif(rule == "TO"):
 			return "to"
 	
-	def findWords(frame):
+	"""
+	Constructs the sentence given an input frame.
+	Calls the findWord function repeatedly.
+	"""
+	def buildSentence(frame):
 		inflect = []
 		patientAdj = []
 		agentAdj = []
@@ -144,6 +160,7 @@ def main():
 		mainVerb = ""
 		agentDet = ""
 		patientDet = ""
+		auxWord = ""
 		q = ""
 
 		if("type" in frame): # main verb
@@ -155,6 +172,8 @@ def main():
 				inflect.append(("polarity",frame["polarity"]))
 			if("number" in frame):
 				inflect.append(("number",frame["number"]))
+			if("aux" in frame):
+				inflect.append((("aux"),frame["aux"]))
 			mainVerb = findWord("V",dict(inflect),{"type":frame["type"]})
 
 		if("agent" in frame): # main agent noun
@@ -175,8 +194,11 @@ def main():
 				elif(k == "det"):
 					patientDet = findWord("DET",{},{"type":frame["patient"][k]})
 		if("speechact" in frame): 
-			if(frame["speechact"] == "question"): # append aux before and ? after sentence
-				inflect = {"time":frame["time"], "polarity": frame["polarity"]} 
+			if(frame["speechact"] == "question"): # need to find aux, eg Should? Did? Could?
+				if("aux" in frame):
+					inflect = {"time":frame["time"], "polarity": frame["polarity"], "aux": frame["aux"]}
+				else:	
+					inflect = {"time":frame["time"], "polarity": frame["polarity"]} 
 				q = ''.join(findWord("AUX",inflect,{}))
 		
 		if(q):		
@@ -244,18 +266,18 @@ def main():
 	# Did the large man eat the peach?
 	inRep = [("type","eat"),("agent",dict((["type","man"],["det","the"],["size","large"],["number","single"]))),\
 			("patient",dict((["type","peach"],["size","small"],["color","red"],["det","a"],["number","single"]))),\
-			("time","past"),("speechact","question"),("polarity","pos"),("number","single")]
+			("time","past"),("speechact","question"),("polarity","pos"),("number","single"),("aux","did")]
 	frame = dict(inRep)
 
-	findWords(frame)
+	buildSentence(frame)
 
 	# We do not use a freezer
 	inRep = [("type","use"),("agent",{"type":"we","number":"plural"}),\
 			("patient",{"type":"freezer","det":"a","number":"single"}),\
-			("time","present"),("speechact","assertion"),("polarity","neg"),("number","single")]
+			("time","present"),("speechact","assertion"),("polarity","neg"),("aux","do"),("number","single")]
 	frame = dict(inRep)
 
-	findWords(frame)
+	buildSentence(frame)
 
 
 	# We prepare the potatoes individually.
@@ -264,7 +286,7 @@ def main():
 			("time","present"),("speechact","assertion"),("polarity","pos"),("number","single"),\
 			("manner","individually")]
 	frame = dict(inRep)
-	findWords(frame)
+	buildSentence(frame)
 
 if __name__ == '__main__':
 	main()
