@@ -7,9 +7,6 @@
 from collections import OrderedDict
 from sys import stdout
 import random
-#import pprint
-
-#pp = pprint.PrettyPrinter(indent=1)
 
 # frame Parts-of-Speech list
 nounList = ["information","location","instrument","source","destination",\
@@ -281,18 +278,40 @@ def main():
 	"""
 	def expand(grammar,stack,frame):
 		sentence = []
-		if(stack == ["S"]):	# first iteration
-			if("aux" in frame and frame["speechact"] == "assertion"): # Caught Aux in beginning
-				stack.pop()
-				rest = buildSentence(frame)
-				"""if(auxFlag == 0):
-					searchFrame = {"aux":frame["aux"]}
-					aux = findWord("AUX",buildInflect(frame),searchFrame)
-					sentence = rest
-				else:
-					sentence = buildSentence"""
+		rest = buildSentence(frame)
+		if("aux" in frame and frame["speechact"] == "assertion"): # Caught Aux in beginning
+			stack.pop()
+			searchFrame = {"aux":frame["aux"]}
+			aux = findWord("AUX",buildInflect(frame),searchFrame)
+			print aux
+		rest = buildSentence(frame)
 		print rest
+
+	def backTrack(sentence):
+		pass
+
+		"""print stack
+		if(stack[len(stack)-1] == "S"):
+			if("aux" not in frame):
+				execRule(grammar[0].rhs[0],stack)
+			else:
+				execRule(grammar[0].rhs[1],stack)
+			
+
+	def execRule(subg,stack):
+		stack.pop()
+		for lhs in reversed(subg):
+			stack.append(lhs)"""
+
+
+
+
 		
+
+		
+		
+
+	
 
 
 	"""
@@ -355,7 +374,8 @@ def main():
 	  		["vegetable oil","vegetable oil"]],\
 	  "V": [["cook","cooked","cooks"],["prepare","prepared","prepares"],["use","used","uses"],\
 	  		["deliver","delivered","delivers"],["take","took","took"], ["complement","complemented","complements"],\
-	  		["isw","was","will be"],["do","did","will do"],["know","knew","knows"],["eat","ate","eats"]],
+	  		["is","was","will be"],["do","did","will do"],["know","knew","knows"],["eat","ate","eats"],\
+	  		["feel","felt","will feel"]],
 	  "AUX": [["can","cannot","could","could not"],["should","should not","should have","shouldn't have"],\
 	  		["so","so","so","so"], ["do","do not","did","did not"],["will","will not","would","would not"],
 	  		["and","and","and","and"], ["then","then","then","then"]],\
@@ -377,7 +397,7 @@ def main():
 			("time","past"),("speechact","question"),("polarity","pos"),("number","single"),("aux","did"),("manner","slowly")]
 	frame = dict(inRep)
 
-	print buildSentence(frame)
+	#print buildSentence(frame)
 
 	# We do not use a freezer
 	inRep = [("type","use"),("agent",{"type":"we","number":"plural"}),\
@@ -387,7 +407,7 @@ def main():
 
 	#print buildSentence(frame)
 	stack = ["S"]
-	expand(g,stack,frame)
+	#expand(g,stack,frame)
 
 
 	# We prepare the potatoes individually.
@@ -396,7 +416,7 @@ def main():
 			("time","present"),("speechact","assertion"),("polarity","pos"),("number","single"),\
 			("manner","individually")]
 	frame = dict(inRep)
-	print buildSentence(frame)
+	#expand(g,stack,frame)
 
 
 	# So we use fresh large potatoes
@@ -408,7 +428,7 @@ def main():
 	#buildSentence(frame)
 
 	stack = ["S"]
-	expand(g,stack,frame)
+	#expand(g,stack,frame)
 
 	# And we deliver them fresh to our stores.
 	inRep = [("type","deliver"),("agent",{"type":"we","number":"plural"}),\
@@ -419,7 +439,7 @@ def main():
 	frame = dict(inRep)
 
 	stack = ["S"]
-	expand(g,stack,frame)
+	#expand(g,stack,frame)
 
 
 	# Then we cook them in trans-fat-free vegetable oil
@@ -431,7 +451,8 @@ def main():
 	frame = dict(inRep)
 
 	stack = ["S"]
-	expand(g,stack,frame)
+	while(stack):
+		expand(g,stack,frame)
 
 	# Every day, we take whole new potatoes
 	inRep = [("type","take"),("agent",{"type":"we","number":"plural"}),\
@@ -441,7 +462,19 @@ def main():
 	frame = dict(inRep)
 
 	stack = ["S"]
-	expand(g,stack,frame)
+	#expand(g,stack,frame)
+
+
+	# Regarding french-fries, we feel that fresh is the best way.
+	inRep = [("type","feel"),("agent",{"type":"we","number":"plural"}),\
+			("patient",{"type":"french-fry","number":"plural","style":"whole","age":"new"}),\
+			("time","present"),("speechact","assertion"),("polarity","pos"),("number","single"),("aux","Every day")]
+	
+	frame = dict(inRep)
+
+	stack = ["S"]
+	#expand(g,stack,frame)
+	
 
 if __name__ == '__main__':
 	main()
