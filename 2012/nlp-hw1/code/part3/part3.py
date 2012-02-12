@@ -6,19 +6,17 @@
 
 from collections import OrderedDict
 from sys import stdout
-import pprint
 import random
+#import pprint
 
-pp = pprint.PrettyPrinter(indent=1)
+#pp = pprint.PrettyPrinter(indent=1)
 
 # frame Parts-of-Speech list
 nounList = ["information","location","instrument","source","destination",\
 			"beneficiary","time","location","attribute","experiencer","agent","patient"]
-adjList = ["color","age","size","quality"]
+adjList = ["color","age","size","quality","style"]
 advList = ["manner"]
-
-agentNum = "" 	# Agent is singular or plural
-patientNum = ""	# Patient is singular or plural
+pronounList = ["owner"]
 
 def main():
 	
@@ -110,6 +108,7 @@ def main():
 			else:
 				# We are selecting a word. Most probably for a question
 				l = [item for sublist in lexicon[rule] for item in sublist] # flattened list
+				
 				#sel = [] # will select randomly from this list
 				if(inflect["time"] == "past"): 
 					if(inflect["polarity"] == "pos"): # Past positive : start from l[2]
@@ -122,30 +121,43 @@ def main():
 								neg = l[i]
 						return neg
 					else: # Past negative : start from l[3]
-						for i in range(len(l)):
-							if(i%4==3):
-								sel.append(l[i])
-						return random.sample(sel,1)
+						#for i in range(len(l)):
+						#	if(i%4==3):
+						#		sel.append(l[i])
+						#return random.sample(sel,1)
+						for i,w in enumerate(l):
+							if(w == inflect["aux"]):
+								neg = l[i+1]
+						return neg
 				else: # time is present/future
 					if(inflect["polarity"] == "pos"): # Present positive : start from l[2]
-						for i in range(len(l)):
-							if(i%4==0):
-								sel.append(l[i])
-						return random.sample(sel,1)
+						#for i in range(len(l)):
+						#	if(i%4==0):
+						#		sel.append(l[i])
+						#return random.sample(sel,1)
+						for i,w in enumerate(l):
+							if(w == inflect["aux"]):
+								neg = l[i]
+						return neg
 					else: # present negative : start from l[1]
-						for i in range(len(l)):
-							if(i%4==1):
-								sel.append(l[i])
-						return random.sample(sel,1)
-								
-		elif(rule == "ADJ" or rule == "PREP" or rule == "DET"): # Adjective or Preposition or Gerund
+						#for i in range(len(l)):
+						#	if(i%4==1):
+						#		sel.append(l[i])
+						#return random.sample(sel,1)
+						for i,w in enumerate(l):
+							if(w == inflect["aux"]):
+								neg = l[i]
+						return neg
+		elif(rule == "ADJ" or rule == "PREP" or rule == "DET" or rule == "ADV"): # Adjective or Preposition or Gerund
 			word = frame["type"]
 			for index,w in enumerate(lexicon[rule]):
 				if(w==word):
 					return word
-		elif(rule == "TO"):
-			return "to"
-	
+		elif(rule == "PRO"):
+			for index,w in enumerate(frame):
+				if(w in pronounList):
+					return frame[w]
+		
 	"""
 	Constructs the sentence given an input frame.
 	Calls the findWord function repeatedly.
@@ -161,9 +173,16 @@ def main():
 		patientDet = ""
 		auxWord = ""
 		q = ""
+		adverb = ""
+		proNounFlag = 0 # eg noun is "them" 
+		roleFlag = 0 # there is a preposition and PP[role head] is activated
+		proNoun = ""
+		secAdj = "" # secondary Adjective
+		auxFlag = 0
+
 
 		if("type" in frame): # main verb
-			if("time" in frame):
+			"""if("time" in frame):
 				inflect.append(("time",frame["time"]))
 			if("speechact" in frame):
 				inflect.append(("speechact",frame["speechact"]))
@@ -172,16 +191,15 @@ def main():
 			if("number" in frame):
 				inflect.append(("number",frame["number"]))
 			if("aux" in frame):
-				inflect.append((("aux"),frame["aux"]))
-			mainVerb = findWord("V",dict(inflect),{"type":frame["type"]})
+				inflect.append((("aux"),frame["aux"]))"""
+
+			mainVerb = findWord("V",buildInflect(frame),{"type":frame["type"]})
 
 		if("agent" in frame): # main agent noun
 			for k,v in frame["agent"].items():
-				# print "Parsing item in agent ", k
 				if(k=="type"): # main noun
 					agentNoun = findWord("N",frame["agent"],frame["agent"])
 				elif(k in adjList):
-					#agentAdj.append(findWord("ADJ",{},{"type":frame["agent"][k]}))
 					agentAdj.append(findWord("ADJ",{},{"type":frame["agent"][k]}))
 				elif(k == "det"):
 					agentDet = findWord("DET",{},{"type":frame["agent"][k]})
@@ -190,6 +208,8 @@ def main():
 				if(k=="type"): # main patient noun
 				## TODO : Not checking for plurals here
 					patientNoun  = findWord("N",frame["patient"],frame["patient"])
+					if(patientNoun=="them"):
+						proNounFlag = 1
 				elif(k in adjList):
 					patientAdj.append(findWord("ADJ",{},{"type":frame["patient"][k]}))
 				elif(k == "det"):
@@ -201,54 +221,123 @@ def main():
 				else:	
 					inflect = {"time":frame["time"], "polarity": frame["polarity"]} 
 				q = ''.join(findWord("AUX",inflect,{}))
+		if("manner" in frame):
+			adverb = findWord("ADV",{},{"type":frame["manner"]})
+		if("role" in frame):
+			roleType = findPrep(frame) # eg destination
+			rolePrep = frame["role"]["type"] # eg to
+			roleNoun = findWord("N",frame["role"][roleType],frame["role"][roleType]) # eg stores
+			#print frame["role"]
+			for v in frame["role"][roleType]:
+				if(v in pronounList):
+					proNoun = findWord("PRO",frame["role"][roleType],frame["role"][roleType])
+				elif(v in adjList):
+					secAdj = findWord("ADJ", {} , {"type":frame["role"][roleType][v]})
+			roleFlag = 1
+
 		
+		# Have to fix this
 		if(q):		
-			print ' '.join([q,agentDet,' '.join(agentAdj),agentNoun,mainVerb,patientDet,' '.join(patientAdj),patientNoun,"?"]) 
+			return ' '.join([q,agentDet,' '.join(agentAdj),agentNoun,mainVerb,patientDet,' '.join(patientAdj),patientNoun,adverb,"?"]) 
 		else:
-			print ' '.join([agentDet,' '.join(agentAdj),agentNoun,mainVerb,patientDet,' '.join(patientAdj),patientNoun])
+			if(proNounFlag == 1):
+				if(roleFlag == 1):
+					return [agentDet,' '.join(agentAdj),agentNoun,mainVerb,patientDet,patientNoun,' '.join(patientAdj),adverb,rolePrep,proNoun,secAdj,roleNoun]
+				else:
+					return [agentDet,' '.join(agentAdj),agentNoun,mainVerb,patientDet,patientNoun,' '.join(patientAdj),adverb]
+			else:
+				return [agentDet,' '.join(agentAdj),agentNoun,mainVerb,patientDet,' '.join(patientAdj),patientNoun,adverb]		
+		
+	"""
+	Builds Inflect
+	"""
+
+	def buildInflect(frame):
+		inflect = []
+		if("time" in frame):
+			inflect.append(("time",frame["time"]))
+		if("speechact" in frame):
+			inflect.append(("speechact",frame["speechact"]))
+		if("polarity" in frame):
+			inflect.append(("polarity",frame["polarity"]))
+		if("number" in frame):
+			inflect.append(("number",frame["number"]))
+		if("aux" in frame):
+			inflect.append((("aux"),frame["aux"]))
+		return dict(inflect)
+
+
+	"""
+	Finds the appropriate Preposition
+	"""
+	def findPrep(frame):
+		if("destination" in frame["role"]):
+			return "destination"
+		if("inwhat" in frame["role"]):
+			return "inwhat"
+
+	"""
+	Expands the grammar
+	"""
+	def expand(grammar,stack,frame):
+		sentence = []
+		if(stack == ["S"]):	# first iteration
+			if("aux" in frame and frame["speechact"] == "assertion"): # Caught Aux in beginning
+				stack.pop()
+				rest = buildSentence(frame)
+				"""if(auxFlag == 0):
+					searchFrame = {"aux":frame["aux"]}
+					aux = findWord("AUX",buildInflect(frame),searchFrame)
+					sentence = rest
+				else:
+					sentence = buildSentence"""
+		print rest
+		
+
+
+	"""
+	Executes one rule
 	
+	def execRule(grammar,stack,frame):
+		for k,v in enumerate(grammar):
+			if v.lhs == stack[len(stack)-1]: # top element of stack - to be expanded. Initially S
+				# Found item to be expanded, now need to select rule
+				stack.pop()
+
+				break
 	"""
-	Parses the grammar passed with the frame included
-	Eg: Parse("NP[head:agent]",frame)
-	"""
-	def Parse(grammar,frame):
-		pass
 
 	# initialize list of grammar rules
 	g = []
 	
 	# add items
+	# S
 	rhsRule = 	[OrderedDict([("NP",["head","agent"]),("VP",["head"])]),\
 				OrderedDict([("AUX",["head","agent"]),("NP",["head","agent"]),("VP",["head"])]),\
-				OrderedDict([("DET",["head","det"]),("ADJ*",["head"]),("N",["head","type"]),("PP*",["head"])])]
+				OrderedDict([("NP",["head","agent"]),("AUX",["head","agent"]),("VP",["head"])])]
 	
-	# S
 	g.append(Grammar("S",rhsRule))
 	
+	# NP
 	rhsRule = 	[OrderedDict([("DET",["head","det"]),("ADJ*",["head"]),("N",["head","type"]),("PP*",["head"])]),\
 				OrderedDict([("PRO",["head"])]),\
 				OrderedDict([("N",["head","type"]),("PP*",["head"])])]
 	
-	# NP
 	g.append(Grammar("NP",rhsRule))
 
-	rhsRule = 	[OrderedDict([("V",["head","type","head","time"]),("NP",["head","patient"])]),\
-				OrderedDict([("V",["head","type","head","time"]), ("NP",["head","patient"]), ("PP*",["head"])]),\
+	# VP
+	rhsRule = 	[OrderedDict([("V",[["head","type"],["head","time"]]),("NP",["head","patient"])]),\
+				OrderedDict([("V",[["head","type"],["head","time"]]), ("NP",["head","patient"]), ("PP*",["head"])]),\
 				OrderedDict([("N",["head","type"]),("PP*",["head"])])]
 	
-	# VP
 	g.append(Grammar("VP",rhsRule))
 
+	# PP
 	rhsRule = 	[OrderedDict([("PREP",["head","role"]),("NP",["head"])])]
 	
-	# VP
-	g.append(Grammar("PP",rhsRule))
+	g.append(Grammar("PP*",rhsRule))
 
-		
-	
-	 
-
-	# loop over grammar and print rules
+	# loop over grammar and output rules
 	for i in range(len(g)):
 		Grammar.parse(g[i])
 
@@ -262,38 +351,33 @@ def main():
 
 	lexicon = { 
 	  "N":[["potato","potatoes"],["In-N-Out","In-N-Out"],["french-fry","french-fries"],["way","ways"],
-	  		["store","stores"],["we","we"],["man","men"],["peach","peaches"],["freezer","freezers"]],\
+	  		["store","stores"],["we","we"],["man","men"],["peach","peaches"],["freezer","freezers"],["them","them"],
+	  		["vegetable oil","vegetable oil"]],\
 	  "V": [["cook","cooked","cooks"],["prepare","prepared","prepares"],["use","used","uses"],\
 	  		["deliver","delivered","delivers"],["take","took","took"], ["complement","complemented","complements"],\
-	  		["is","was","will be"],["do","did","will do"],["know","knew","knows"],["eat","ate","eats"]],
+	  		["isw","was","will be"],["do","did","will do"],["know","knew","knows"],["eat","ate","eats"]],
 	  "AUX": [["can","cannot","could","could not"],["should","should not","should have","shouldn't have"],\
-	   		 ["do","do not","did","did not"],["will","will not","would","would not"]],\
-	  "ADJ": ["bold","best","large","tasty","fresh","good","whole","trans-fat-free","vegetable",\
-	  		  "hot","large","red","small"],\
-	  "ADV": ["individually","not"],
+	  		["so","so","so","so"], ["do","do not","did","did not"],["will","will not","would","would not"],
+	  		["and","and","and","and"], ["then","then","then","then"]],\
+	  "ADJ": ["bold","best","large","tasty","fresh","good","whole","trans-fat-free",\
+	  		  "hot","large","red","small","new"],\
+	  "ADV": ["individually","not","slowly"],
 	  "PREP": ["at","that","we","our"],
 	  "DET": ["a","an","the","that"],
 	  "GER": ["regarding"],
-	  "PRO" : ["our","we",""]
+	  "PRO" : ["our","we"]
 	}
 	
-	# Test cases
-	#print findWord("N",{"number":"pluaral"},{"type":"potato"})
-	#print findWord("V",{"time":"future","number":"plural"},{"type":"prepare"})
-	#print findWord("AUX",{"time":"past","polarity":"neg"},{"type":"should"})
-	#print findWord("ADJ",{},{"type":"best"})
-	#print findWord("PREP",{},{"type":"at"})
-
 	# Initialize frame
 	frame = {}
 
-	# Did the large man eat the peach?
+	# Did the large man eat the small red peach slowly?
 	inRep = [("type","eat"),("agent",dict((["type","man"],["det","the"],["size","large"],["number","single"]))),\
 			("patient",dict((["type","peach"],["size","small"],["color","red"],["det","a"],["number","single"]))),\
-			("time","past"),("speechact","question"),("polarity","pos"),("number","single"),("aux","did")]
+			("time","past"),("speechact","question"),("polarity","pos"),("number","single"),("aux","did"),("manner","slowly")]
 	frame = dict(inRep)
 
-	buildSentence(frame)
+	print buildSentence(frame)
 
 	# We do not use a freezer
 	inRep = [("type","use"),("agent",{"type":"we","number":"plural"}),\
@@ -301,7 +385,9 @@ def main():
 			("time","present"),("speechact","assertion"),("polarity","neg"),("aux","do"),("number","single")]
 	frame = dict(inRep)
 
-	buildSentence(frame)
+	#print buildSentence(frame)
+	stack = ["S"]
+	expand(g,stack,frame)
 
 
 	# We prepare the potatoes individually.
@@ -310,14 +396,52 @@ def main():
 			("time","present"),("speechact","assertion"),("polarity","pos"),("number","single"),\
 			("manner","individually")]
 	frame = dict(inRep)
-	buildSentence(frame)
+	print buildSentence(frame)
 
+
+	# So we use fresh large potatoes
 	inRep = [("type","use"),("agent",{"type":"we","number":"plural"}),\
 			("patient",{"type":"potato","number":"plural","quality":"fresh","size":"large"}),\
 			("time","present"),("speechact","assertion"),("polarity","pos"),("number","single"),("aux","so")]
 
 	frame = dict(inRep)
-	buildSentence(frame)
+	#buildSentence(frame)
+
+	stack = ["S"]
+	expand(g,stack,frame)
+
+	# And we deliver them fresh to our stores.
+	inRep = [("type","deliver"),("agent",{"type":"we","number":"plural"}),\
+			("patient",{"type":"them","number":"plural","quality":"fresh"}),\
+			("time","present"),("speechact","assertion"),("polarity","pos"),("number","single"),("aux","and"),\
+			("role",{"type":"to","destination":{"type":"store","number":"plural","owner":"our"}})]
+
+	frame = dict(inRep)
+
+	stack = ["S"]
+	expand(g,stack,frame)
+
+
+	# Then we cook them in trans-fat-free vegetable oil
+	inRep = [("type","cook"),("agent",{"type":"we","number":"plural"}),\
+			("patient",{"type":"them","number":"plural"}),\
+			("time","present"),("speechact","assertion"),("polarity","pos"),("number","single"),("aux","then"),\
+			("role",{"type":"in","inwhat":{"type":"vegetable oil","number":"single","style":"trans-fat-free"}})]
+	
+	frame = dict(inRep)
+
+	stack = ["S"]
+	expand(g,stack,frame)
+
+	# Every day, we take whole new potatoes
+	inRep = [("type","take"),("agent",{"type":"we","number":"plural"}),\
+			("patient",{"type":"potato","number":"plural","style":"whole","age":"new"}),\
+			("time","present"),("speechact","assertion"),("polarity","pos"),("number","single"),("aux","Every day")]
+	
+	frame = dict(inRep)
+
+	stack = ["S"]
+	expand(g,stack,frame)
 
 if __name__ == '__main__':
 	main()
