@@ -1,0 +1,4 @@
+# Exclude training data - licensing issues
+*.bio
+input_file
+eval.txt
