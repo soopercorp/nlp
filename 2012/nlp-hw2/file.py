@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 
-import re
 import pprint
 import string
 
+#pretty print
 pp = pprint.PrettyPrinter(indent=4)
 
+#point to files
 testFile = "/home/hr/study/nlp/2012/nlp-hw2/eng.train.bio"
 funcFile = "/home/hr/study/nlp/2012/nlp-hw2/prep.txt"
 arffFile = "/home/hr/study/nlp/2012/nlp-hw2/features.arff"
 
+#punctuations
 puncs = ['.',',','!','(',')','-',':',';','~','--','"','?','$',"''"]
 
 #open testfile
