@@ -6,6 +6,6 @@ This is my school-work! Please ignore! I do not want any contributions on this r
 
 ## Copyright:
 
-For all files in 2010 and 2011 directories, Copyright [Eduard Hovy](www.isi.edu/~hovy)
+For all files in 2010 and 2011 directories, Copyright [Eduard Hovy](http://isi.edu/~hovy)
 
-For all files in 2012 directory, Copyright [Hardik Ruparel](www-scf.usc.edu/~hruparel)
+For all files in 2012 directory, Copyright [Hardik Ruparel](http://www-scf.usc.edu/~hruparel)
