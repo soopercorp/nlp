@@ -1,5 +1,6 @@
 # Exclude training data - licensing issues
 *.bio
+*.tsv
 input_file
 *.arff
 *.txt
